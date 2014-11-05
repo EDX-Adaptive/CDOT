@@ -1,0 +1,13 @@
+/* all custom css code should go here */
+img.logo {
+    width:60px;
+    height:auto;
+}
+
+.container {
+    border: 1px solid #777;
+}
+
+.navbar-inner {
+    background-color: lightcyan;
+}

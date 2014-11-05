@@ -1,0 +1,27 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <h2>Databases</h2>
+    <table class="table table-striped">
+        <thead><tr>
+            <th>ID</th>
+            <th>Name/Path</th>
+            <th>Engine</th>
+        </tr></thead>
+        <tbody>
+        {% for database in object_list %}
+        <tr>
+            <td>{{ database.id }}</td>
+            <td>{{ database.name }}</td>
+            <td>{{ database.engine }}</td>
+            <td>
+                <a href="{% url 'database_update' %}">Edit</a>
+                <a href="{% url 'database_detail' %}">Details</a>
+                <a href="{% url 'database_delete' %}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
