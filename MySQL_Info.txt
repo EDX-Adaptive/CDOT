@@ -1,4 +1,0 @@
-edxapp
-root
-your_password
-localhost
