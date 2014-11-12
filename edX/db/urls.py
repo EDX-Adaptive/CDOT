@@ -14,4 +14,5 @@ urlpatterns = patterns('',
         url(r'^databases/update', views.DatabaseUpdate.as_view(), name='database_update'),
         url(r'^databases/delete', views.DatabaseDelete.as_view(), name='database_delete'),
         url(r'^(?P<slug>[-_\w]+)/$', views.DatabaseDetail.as_view(), name='database_detail'),
+        url(r'^state', views.state)
 )

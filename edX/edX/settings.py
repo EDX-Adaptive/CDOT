@@ -16,14 +16,23 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# retrieving MySQL database information from a file:
+f = open('../../MySQL_Info.txt')
+
+db_name = f.readline().strip()
+db_user = f.readline().strip()
+db_password = f.readline().strip()
+db_host = f.readline().strip()
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(PROJECT_PATH, 'db.db'),                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': db_name,                      # Or path to database file if using sqlite3.
+        # The following settings are not used with sqlite3:
+        'USER': db_user,
+        'PASSWORD': db_password,
+        'HOST': db_host,                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',                      # Set to empty string for default.
     }
 }
 

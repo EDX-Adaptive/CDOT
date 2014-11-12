@@ -14,6 +14,9 @@ from db.models import Database
 from db.forms import DatabaseForm
 from django.core.urlresolvers import reverse_lazy
 
+from db.models import courseware_studentmodule
+import json
+
 # Create your views here.
 class DatabaseFormView(FormView):
     template_name = 'database_form.html'
@@ -104,3 +107,66 @@ def list(request):
     context_dict = {'test': "Hello Testing"}
 
     return render_to_response('db/list.html', context_dict, context)
+
+
+def state(request):
+
+    studentId = 6
+
+    # in order to get records of all students
+    # studentModule = courseware_studentmodule.objects.all()
+
+    # in order to get records of a student with particular student_id
+    # and the module_type is 'Problem'
+    studentModule = courseware_studentmodule.objects.filter(
+            student_id = studentId
+        ).filter(
+            module_type = 'Problem'
+        )
+
+    problems = []
+
+    for row in studentModule:
+
+        state = json.loads(row.state)
+        attempts = 0
+        #search in the state JSON array if there were attempts performed on
+        #the current problem
+        for key, value in state.iteritems ():
+            if key == "attempts":
+
+                attempts = value
+                # checking if the student attempted to solve the problem
+                if attempts > 0:
+                    problem = {}
+                    # problem is an associative array that stores values and keys (instead of indexes)
+                    problem["problem_code"] = row.module_id
+                    problem["attempts"] = attempts
+                    problem["grade"] = int ( row.grade / row.max_grade * 100 )
+                    problem["time_took"] = row.modified - row.created
+
+                    problems.append(problem)
+
+    htmlString = "Problems solving results of a student with a student_id = " + str(studentId)
+    htmlString = htmlString + "<table border=\"1\" cellpadding=\"10\">\n"
+
+    htmlString = htmlString + "  <tr align=\"center\">\n"
+    # I am going to return an html code, it is a bad practice. I am doing it here to show the matrix.
+    htmlString = htmlString +   "       <td>problem code</td>\n"
+    htmlString = htmlString +   "       <td>attempts</td>\n"
+    htmlString = htmlString +   "       <td>grade</td>\n"
+    htmlString = htmlString +   "       <td>time took</td>\n"
+    htmlString = htmlString +  "  </tr>\n"
+
+    for row in problems:
+        htmlString = htmlString + "  <tr>\n"
+        htmlString = htmlString +   "       <td>" + row["problem_code"] + "</td>\n"
+        htmlString = htmlString +   "       <td align=\"center\">" + str(row["attempts"]) + "</td>\n"
+        htmlString = htmlString +   "       <td align=\"center\">" + str(row["grade"]) + " %" + "</td>\n"
+        htmlString = htmlString +   "       <td align=\"center\">" + str(row["time_took"]) + "</td>\n"
+        htmlString = htmlString + "  </tr>\n"
+
+
+    htmlString = htmlString + "</table>\n"
+
+    return HttpResponse(htmlString)
