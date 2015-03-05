@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <div  style="width:800px; margin:auto; margin-top:50;">
+        <h3 align="center">Courses in which there is student interaction</h3>
+
+        <table border="1" cellpadding="10" align="center">
+            <tr align="center">
+                <td><b>course id</b></td>
+            </tr>
+            {% for row in courses %}
+            <tr>
+                <td><a href="/courses/view_course/{{row}}">{{ row }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
