@@ -92,6 +92,8 @@ def specifiedCourse(request, course_id):
 
     if request.method == 'POST': # If the form has been submitted...
 
+        print course_id
+
         student_ids = request.POST.getlist('student_ids')
         problem_ids = request.POST.getlist('problem_ids')
 
@@ -248,8 +250,6 @@ def specifiedCourse(request, course_id):
 
     else:
 
-        #course_id = "cdot/1/2015_01"
-
         studentModule = courseware_studentmodule.objects.filter(
                 module_type = 'Problem'
             ).filter(
@@ -281,7 +281,11 @@ def specifiedCourse(request, course_id):
                     problem["max_grade"] = row.max_grade
 
                     problems.append(problem)
-
+        """
+        # testing long list of students
+        for i in range(0,100):
+            students.append(i)
+        """
         extra_context = { "course_id": course_id,
                           "students": students,
                           "problems": problems}
