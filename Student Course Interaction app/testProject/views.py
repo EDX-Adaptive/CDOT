@@ -6,7 +6,11 @@ from django.views.decorators.csrf import csrf_protect
 from django.template import RequestContext
 import re
 import datetime
+import copy
 from datetime import timedelta
+
+# Global variables
+itemsPerProblem = 3
 
 def index(request):
 
@@ -108,6 +112,93 @@ def specifiedCourse(request, course_id):
         # student_states stores student's interaction with different problems
         student_states = []
 
+        # a matrix and a vector that will be used for prediction
+        matrixX = []
+        vectorY = []
+        # creating the structure of matrixX
+        dataForMatrix = courseware_studentmodule.objects.filter(
+            course_id = course_id
+        ).filter(
+            module_type = 'Problem'
+        )
+        allCourseProblems = []
+        for row in dataForMatrix:
+            if not any(row.module_id in s for s in enumerate(allCourseProblems)):
+                allCourseProblems.append(row.module_id)
+
+        # creating data structure to send to the prediction algorithm
+        for studentId in student_ids:
+            # matrixXrow is one row of matrixX
+            # item at index 0 is a student id
+            matrixXrow = []
+            matrixXrow.append(studentId)
+
+            for i in range(0,len(allCourseProblems)):
+                for j in range(0,itemsPerProblem):
+                    matrixXrow.append(0)
+
+            # last item in matrixXrow is the final grade
+
+            # getting times of all course components (courses, chapters, sequentials, problems)
+            studentModule = courseware_studentmodule.objects.filter(
+                        course_id = course_id
+                    ).filter(
+                        student_id = studentId
+                    ).filter(
+                        module_type = "problem"
+                    )
+
+            # sum of all grades (will be used to calculate final grade)
+            sumGrades = 0
+
+            for row in studentModule:
+
+                # check if current problem_id is in passed problem_ids array
+                if any(row.module_id in s for s in enumerate(problem_ids)) or not problem_ids:
+
+                    state = json.loads(row.state)
+                    attempts = 0
+                    #search in the state JSON array if there were attempts performed on
+                    #the current problem
+                    for key, value in state.iteritems ():
+                        if key == "attempts":
+
+                            attempts = value
+                            # checking if the student attempted to solve the problem
+                            if attempts > 0:
+                                # find index where to insert data in matrixXrow
+                                problemItem = allCourseProblems.index(row.module_id)
+                                gradeIndex = problemItem * itemsPerProblem + 1
+                                attemptsIndex = problemItem * itemsPerProblem + 2
+                                timeTookIndex = problemItem * itemsPerProblem + 3
+
+                                matrixXrow[gradeIndex] = int ( row.grade / row.max_grade * 100 )
+                                matrixXrow[attemptsIndex] = attempts
+                                matrixXrow[timeTookIndex] = (row.modified - row.created).seconds
+
+                                sumGrades += int ( row.grade / row.max_grade * 100 )
+
+            # adding final course grade
+            matrixXrow.append(sumGrades / len(allCourseProblems))
+            # adding current student row to matrix
+            matrixX.append(matrixXrow)
+
+        '''
+        # structure of matrixX:
+        [
+            [| student id | problem 1 grade | problem 1 time taken | problem 1 attempts | problem 2 grade | ... | final course grade |],
+            [| student id | problem 1 grade | problem 1 time taken | problem 1 attempts | problem 2 grade | ... | final course grade |]
+        ]
+        '''
+        '''
+        # This is how matrixX will look like for 2 students and 5 course problems:
+        [
+            [u'5', 0, 1, 13, 100, 5, 33, 0, 0, 0, 100, 3, 27, 0, 0, 40],
+            [u'8', 100, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 1, 40]
+        ]
+        '''
+
+        # creating data structure to send to the view
         for studentId in student_ids:
 
             # getting times of all course components (courses, chapters, sequentials, problems)

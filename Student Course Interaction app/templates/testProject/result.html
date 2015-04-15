@@ -1,15 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends 'testProject/base.html' %}
+
+{% block content %}
     <div  style="width:800px; margin:auto; margin-top:50;">
         {% for student_state in student_states %}
             <h3 align="center">Problems solving results of a student with an id: {{ student_state.student_id }}</h3>
 
-            <table border="1" cellpadding="10" align="center">
+            <table class="table">
                 <tr align="center" bgcolor="#0066FF"  style="color:#FFFFFF;">
                     <td>problem code</td>
                     <td>attempts</td>
@@ -48,6 +44,4 @@
                 </tr>
             </table>
         {% endfor %}
-    </div>
-</body>
-</html>
+{% endblock %}
