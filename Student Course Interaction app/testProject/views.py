@@ -8,6 +8,7 @@ import re
 import datetime
 import copy
 from datetime import timedelta
+import cPickle as pickle
 
 # Global variables
 itemsPerProblem = 3
@@ -336,6 +337,10 @@ def specifiedCourse(request, course_id):
 
         extra_context = { "student_ids": student_ids,
                           "student_states": student_states}
+        
+        # Dump matrixX
+        pickle.dump( matrixX, open( "matrixX.p", "wb" ) )
+
 
         return render_to_response("testProject/result.html", extra_context)
 
@@ -380,6 +385,7 @@ def specifiedCourse(request, course_id):
         extra_context = { "course_id": course_id,
                           "students": students,
                           "problems": problems}
+
 
         return render_to_response("testProject/courses/view_course.html", extra_context,
                                context_instance=RequestContext(request))
