@@ -334,12 +334,14 @@ def specifiedCourse(request, course_id):
                 student_state["avg_time_took"] = sum(timeTookArr, datetime.timedelta(0)) / len(timeTookArr)
                 # adding all problems current student tackled
                 student_states.append(student_state)
+                print student_state
 
         extra_context = { "student_ids": student_ids,
                           "student_states": student_states}
         
         # Dump matrixX
         pickle.dump( matrixX, open( "matrixX.p", "wb" ) )
+        pickle.dump( extra_context, open( "results.p", "wb" ) )
 
 
         return render_to_response("testProject/result.html", extra_context)
